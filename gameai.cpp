@@ -4,7 +4,6 @@
 #include <mutex>
 #include <condition_variable>
 #include <chrono>
-#include <limits>
 
 int GameAI::negamax(GameProcess current, int depth, int alpha, int beta, GameProcess &optimal)
 {
