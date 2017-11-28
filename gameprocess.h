@@ -41,8 +41,8 @@ public:
     longint lastactive;     // previous pieces placed, used when calculating the move performed
     bool    player;         // current player, true for X, false for O
 
-    GameProcess();                             // initializer
-    GameProcess(longint board, longint active);        // initializer with start value
+    GameProcess();                                    // initializer
+    GameProcess(longint board, longint active);       // initializer with start value
 
     void getMoveStr(char *output);             // get the last move performed, storing into *output
     int  getPiece(int x, int y);               // get the piece at (x,y): 1 for X, -1 for O, 0 for no piece

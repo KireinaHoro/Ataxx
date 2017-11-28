@@ -1,12 +1,24 @@
 #include "gameai.h"
 #include <vector>
+#include <thread>
+#include <mutex>
+#include <condition_variable>
+#include <chrono>
+#include <limits>
 
-int GameAI::negamax(GameProcess current, int depth, int alpha, int beta, GameProcess *optimal)
+int GameAI::negamax(GameProcess current, int depth, int alpha, int beta, GameProcess &optimal)
 {
+    // premature termination of negamax due to time limit exceeding; return dummy value
+    {
+        std::lock_guard<std::mutex> _(timerMutex);
+        if (timeToQuit)
+            return MAGIC_NUMBER;
+    }
+
     std::vector<GameProcess> moves;
     int tempscore;
     int maxscore = -50;
-    GameProcess *best = nullptr;
+    GameProcess best;
     GameProcess::longint clonemoves = 0;
     GameProcess::longint jumpmoves;
 
@@ -71,37 +83,78 @@ int GameAI::negamax(GameProcess current, int depth, int alpha, int beta, GamePro
     for (auto &i : moves)
     {
         tempscore = -negamax(GameProcess(~i.board, i.active), depth - 1, -beta, -alpha, optimal);
+        if (-tempscore == MAGIC_NUMBER)             // return dummy value if we got a dummy value
+            return MAGIC_NUMBER;
         if (tempscore > maxscore)
         {
             maxscore = tempscore;
             alpha = std::max(alpha, tempscore);
-            best = &i;
+            best = std::move(i);                    // C++11 move constructor
         }
         if (alpha >= beta)
             break;
     }
 
-    *optimal = *best;
+    optimal = std::move(best);
 
     return alpha;
 }
 
-GameProcess GameAI::runAI(GameProcess current)
+void GameAI::runSingleAI(GameProcess current, int depth)
 {
-    // the calling method shall check whether the game has finished; thus we do not check current.isFull() here
-
+    // increment the thread counter
+    {
+        std::lock_guard<std::mutex> _(timerMutex);
+        threadCount ++;
+    }
     // save the current state as the GameProcess objects created by negamax() will lose these information
     GameProcess::longint curr_lastboard = current.board;
     GameProcess::longint curr_lastactive = current.active;
     bool curr_player = current.player;
 
-    negamax(current, NEGAMAX_DEPTH, -50, 50, &current);
+    int ret = negamax(current, depth, -50, 50, current);
 
-    // update the state
-    current.board = ~current.board;
-    current.player = !curr_player;
-    current.lastboard = curr_lastboard;
-    current.lastactive = curr_lastactive;
+    if (ret != MAGIC_NUMBER)     // if the calculation completed in time
+    {
+        // update the state
+        current.board = ~current.board;
+        current.player = !curr_player;
+        current.lastboard = curr_lastboard;
+        current.lastactive = curr_lastactive;
 
-    return current;
+        std::lock_guard<std::mutex> _(dataMutex);
+        ans.push(current);
+    }
+
+    std::lock_guard<std::mutex> _(timerMutex);
+    threadCount --;
+    cv.notify_all();
+}
+
+
+GameProcess GameAI::runParallelAI(GameProcess current)
+{
+    using Clock = std::chrono::steady_clock;
+
+    // fire up the threads
+    for (int d = NEGAMAX_MIN_DEPTH; d <= NEGAMAX_MAX_DEPTH; d ++)
+        std::thread(runSingleAI, current, d).detach();
+
+    auto t0 = Clock::now();
+    auto t1 = t0 + TIMEOUT;
+    std::unique_lock<std::mutex> lk(timerMutex);
+    while (!timeToQuit && Clock::now() < t1)
+        cv.wait_until(lk, t1);
+    timeToQuit = true;          // time's up; notify the workers
+
+    while (threadCount > 0)
+        cv.wait(lk);
+
+    // it's safe to access ans directly as no threads are running for now
+    return ans.top();
+}
+
+GameProcess GameAI::runAI(GameProcess current)
+{
+    return runParallelAI(current);
 }
