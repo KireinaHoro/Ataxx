@@ -101,11 +101,6 @@ int GameAI::negamax(GameProcess current, int depth, int alpha, int beta, GamePro
 
 void GameAI::runSingleAI(GameProcess current, int depth)
 {
-    // increment the thread counter
-    {
-        std::lock_guard<std::mutex> _(timerMutex);
-        threadCount ++;
-    }
     // save the current state as the GameProcess objects created by negamax() will lose these information
     GameProcess::longint curr_lastboard = current.board;
     GameProcess::longint curr_lastactive = current.active;
@@ -125,6 +120,19 @@ void GameAI::runSingleAI(GameProcess current, int depth)
         ans.push(current);
     }
 
+}
+
+void GameAI::runSerialAI(GameProcess current)
+{
+    // increment the thread counter
+    {
+        std::lock_guard<std::mutex> _(timerMutex);
+        threadCount ++;
+    }
+
+    for (int d = NEGAMAX_MIN_DEPTH; d <= NEGAMAX_MAX_DEPTH; d ++)
+        std::thread(runSingleAI, current, d).join();
+
     std::lock_guard<std::mutex> _(timerMutex);
     threadCount --;
     cv.notify_all();
@@ -136,8 +144,7 @@ GameProcess GameAI::runParallelAI(GameProcess current)
     using Clock = std::chrono::steady_clock;
 
     // fire up the threads
-    for (int d = NEGAMAX_MIN_DEPTH; d <= NEGAMAX_MAX_DEPTH; d ++)
-        std::thread(runSingleAI, current, d).detach();
+    std::thread(runSerialAI, current).detach();
 
     auto t0 = Clock::now();
     auto t1 = t0 + TIMEOUT;

@@ -21,6 +21,7 @@ const auto TIMEOUT = std::chrono::milliseconds(950);
 
 // for parallel processing multiple depths of searching
 void runSingleAI(GameProcess current, int depth);
+void runSerialAI(GameProcess current);
 GameProcess runParallelAI(GameProcess current);
 
 static int threadCount = 0;
