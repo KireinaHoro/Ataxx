@@ -1,9 +1,6 @@
 #include "gameai.h"
 #include <vector>
 #include <thread>
-#include <mutex>
-#include <condition_variable>
-#include <chrono>
 
 int GameAI::negamax(GameProcess current, int depth, int alpha, int beta, GameProcess &optimal)
 {

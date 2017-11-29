@@ -1,7 +1,6 @@
 #include "gameprocess.h"
 #include <cstring>
 #include <cstdlib>
-#include <iostream>
 
 #ifdef __LP64__
 
