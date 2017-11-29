@@ -116,7 +116,6 @@ void GameAI::runSingleAI(GameProcess current, int depth)
         current.lastboard = curr_lastboard;
         current.lastactive = curr_lastactive;
 
-        std::lock_guard<std::mutex> _(dataMutex);
         ans.push(current);
     }
 
@@ -131,7 +130,7 @@ void GameAI::runSerialAI(GameProcess current)
     }
 
     for (int d = NEGAMAX_MIN_DEPTH; d <= NEGAMAX_MAX_DEPTH; d ++)
-        std::thread(runSingleAI, current, d).join();
+        runSingleAI(current, d);
 
     std::lock_guard<std::mutex> _(timerMutex);
     threadCount --;
@@ -139,7 +138,7 @@ void GameAI::runSerialAI(GameProcess current)
 }
 
 
-GameProcess GameAI::runParallelAI(GameProcess current)
+GameProcess GameAI::runTimerAI(GameProcess current)
 {
     using Clock = std::chrono::steady_clock;
 
@@ -162,5 +161,5 @@ GameProcess GameAI::runParallelAI(GameProcess current)
 
 GameProcess GameAI::runAI(GameProcess current)
 {
-    return runParallelAI(current);
+    return runTimerAI(current);
 }

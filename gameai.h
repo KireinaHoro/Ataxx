@@ -22,12 +22,11 @@ const auto TIMEOUT = std::chrono::milliseconds(950);
 // for parallel processing multiple depths of searching
 void runSingleAI(GameProcess current, int depth);
 void runSerialAI(GameProcess current);
-GameProcess runParallelAI(GameProcess current);
+GameProcess runTimerAI(GameProcess current);
 
 static int threadCount = 0;
 static std::stack<GameProcess> ans;     // pool of answers from different search depths; the latest one will be chosen
 static std::mutex timerMutex;           // mutex to keep the timer consistent
-static std::mutex dataMutex;            // mutex to keep the answer vector consistent
 static std::condition_variable cv;      // condition variable for communication between worker and caller
 static bool timeToQuit;                 // if it's time to quit
 
