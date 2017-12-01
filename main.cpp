@@ -1,11 +1,9 @@
-#include "gamewindow.h"
-#include <QApplication>
+#include <botzonerunner.h>
 
 int main(int argc, char *argv[])
 {
-    QApplication a(argc, argv);
-    GameWindow w;
-    w.show();
+    BotzoneRunner a;
+    a.run();
 
-    return a.exec();
+    return 0;
 }

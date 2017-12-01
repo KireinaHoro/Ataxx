@@ -25,22 +25,15 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
         main.cpp \
-        gamewindow.cpp \
     gameai.cpp \
     gameprocess.cpp \
-    gamepiece.cpp \
-    gameboard.cpp \
     botzonerunner.cpp
 
 HEADERS += \
-        gamewindow.h \
     gameai.h \
     gameprocess.h \
-    gamepiece.h \
-    gameboard.h \
     botzonerunner.h
 
-FORMS += \
-        gamewindow.ui
+FORMS +=
 
 CONFIG += c++11
