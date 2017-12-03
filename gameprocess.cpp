@@ -1,7 +1,8 @@
 #include "gameprocess.h"
 #include <cstring>
 #include <cstdlib>
-#include <iostream>
+#include <sstream>
+#include <functional>
 
 #ifdef __LP64__
 
@@ -368,6 +369,14 @@ GameProcess::GameProcess(longint board, longint active) : board(board), active(a
     player      = true;
 }
 
+GameProcess::GameProcess(bool first) : player(first)
+{
+    board       = STARTBOARD;
+    lastboard   = STARTBOARD;
+    active      = STARTACTIVE;
+    lastactive  = STARTACTIVE;
+}
+
 void GameProcess::getMoveStr(char *output)
 {
     if ((active ^ lastactive) & (~active))     // jump move
@@ -411,17 +420,17 @@ void GameProcess::getMoveStr(char *output)
         strcpy(output, "pass");
 }
 
-int GameProcess::getPiece(int x, int y)
+GameProcess::Piece GameProcess::getPiece(int x, int y)
 {
     if (active & mask[7 * x + y])       // piece present
     {
         if(board & mask[7 * x + y])     // piece for X
-            return player ? 1 : -1;
+            return player ? X : O;
         else                            // piece for O
-            return player ? -1 : 1;
+            return player ? O : X;
     }
     else                                // piece not present
-        return 0;
+        return Absent;
 }
 
 int GameProcess::getScore()
@@ -429,8 +438,16 @@ int GameProcess::getScore()
     return score(board & active) - score(~board & active);
 }
 
-int GameProcess::getAvailableMoves()
+bool GameProcess::isMoveAvailable()
 {
+    longint pieces = board & active;
+    longint moves = 0;
+    for (int i = 0; i < 49; i ++)
+        if (pieces & mask[i])
+            moves |= clonemask[i] | jumpmask[i];
+    moves &= ~active;
+    return moves;
+    /*
     int nummoves = 0;
     longint clonemoves = 0;         // all location valid for clone moves
     longint jumpmoves;              // location valid for jump moves for each piece
@@ -458,6 +475,7 @@ int GameProcess::getAvailableMoves()
         }
 
     return nummoves;
+    */
 }
 
 void GameProcess::doMove(const char *move)
@@ -494,7 +512,54 @@ void GameProcess::doMove(int u, int v, int x, int y)
     free(move);
 }
 
+bool GameProcess::isValidMove(int u, int v, int x, int y)
+{
+    if (u < 0 || v < 0 || x < 0 || y < 0)
+        return false;
+    if (isFull())                                   // the board is full
+        return false;
+    if (!(board & active & mask[7 * u + v]))        // the picked piece is not possessed by the current player
+        return false;
+    if (active & mask[7 * x + y])                   // a piece is present at the destination
+        return false;
+    if (!(mask[7 * x + y] & (clonemask[7 * u + v] | jumpmask[7 * u + v])))
+                                                    // the destination is out of range
+        return false;
+    return true;
+}
+
+bool GameProcess::isEmpty()
+{
+    if (board == STARTBOARD && active == STARTACTIVE)
+        return true;
+    else
+        return false;
+}
+
 bool GameProcess::isFull()
 {
     return active == FULLBOARD;
+}
+
+GameProcess::StoreData GameProcess::storeProcess()
+{
+    std::ostringstream os;
+
+    os << board << ' ' << lastboard << ' '
+       << active << ' ' << lastactive << ' '
+       << player;
+
+    return StoreData(os.str(), std::hash<std::string>{}(os.str()));
+}
+
+void GameProcess::loadProcess(StoreData data)
+{
+    if (data.second != std::hash<std::string>{}(data.first))    // the hash does not match
+        return;
+
+    std::istringstream is(data.first);
+
+    is >> board >> lastboard
+       >> active >> lastactive
+       >> player;
 }

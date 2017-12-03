@@ -14,8 +14,8 @@ int negamax(GameProcess current,
         int beta,
         GameProcess &optimal);
 
-const int NEGAMAX_MIN_DEPTH = 5;
-const int NEGAMAX_MAX_DEPTH = 13;
+const int NEGAMAX_MIN_DEPTH = 4;
+const int NEGAMAX_MAX_DEPTH = 10;
 const int MAGIC_NUMBER = 0x3F3F3F3F;    // used to inform the caller function that timeout has been reached in negamax recursion
 const auto TIMEOUT = std::chrono::milliseconds(950);
 

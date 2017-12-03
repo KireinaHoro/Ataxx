@@ -52,14 +52,15 @@ void BotzoneRunner::run()
 
 }
 
-void BotzoneRunner::debug(GameProcess &state, const char *str)
+void BotzoneRunner::debug(const GameProcess &state, const char *str)
 {
+    GameProcess k = state;
     std::cout << "===== " << str << " =====" << std::endl;
     for (int i = 0; i < 7; i ++)
     {
         for (int j = 0; j < 7; j ++)
-            std::cout << state.getPiece(j, i) << ' ';
+            std::cout << k.getPiece(j, i) << ' ';
         std::cout << std::endl;
     }
-    std::cout << state.player << ' ' << state.board << ' ' << state.active << ' ' << state.lastactive << std::endl;
+    std::cout << k.player << ' ' << k.board << ' ' << k.active << ' ' << k.lastactive << std::endl;
 }

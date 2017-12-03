@@ -4,6 +4,7 @@
 #include <mutex>
 #include <condition_variable>
 #include <chrono>
+#include <iostream>
 
 int GameAI::negamax(GameProcess current, int depth, int alpha, int beta, GameProcess &optimal)
 {
@@ -135,6 +136,9 @@ GameProcess GameAI::runParallelAI(GameProcess current)
 {
     using Clock = std::chrono::steady_clock;
 
+    // reset the global variables
+    ans = std::stack<GameProcess>();
+    timeToQuit = false;
     // fire up the threads
     for (int d = NEGAMAX_MIN_DEPTH; d <= NEGAMAX_MAX_DEPTH; d ++)
         std::thread(runSingleAI, current, d).detach();
@@ -150,6 +154,11 @@ GameProcess GameAI::runParallelAI(GameProcess current)
         cv.wait(lk);
 
     // it's safe to access ans directly as no threads are running for now
+    if (!ans.size())
+    {
+        std::cerr << "Something happened." << std::endl;
+        exit(-1);
+    }
     return ans.top();
 }
 

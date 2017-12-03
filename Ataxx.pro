@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui sql
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -27,13 +27,32 @@ SOURCES += \
         main.cpp \
     gameai.cpp \
     gameprocess.cpp \
-    botzonerunner.cpp
+    botzonerunner.cpp \
+    mainwindow.cpp \
+    clickablelabel.cpp \
+    fixedratiowidget.cpp \
+    highscoredialog.cpp \
+    ataxxplayerthread.cpp \
+    aiataxxplayer.cpp
 
 HEADERS += \
     gameai.h \
     gameprocess.h \
-    botzonerunner.h
+    botzonerunner.h \
+    mainwindow.h \
+    clickablelabel.h \
+    fixedratiowidget.h \
+    highscore_columns.h \
+    highscoredialog.h \
+    utils.h \
+    iataxxplayer.h \
+    ataxxplayerthread.h \
+    aiataxxplayer.h \
+    connect.h
 
 FORMS +=
 
-CONFIG += c++11
+CONFIG += c++14
+
+RESOURCES += \
+    images.qrc

@@ -11,8 +11,7 @@ public:
 
     void run();
 
-private:
-    void debug(GameProcess &state, const char *str);
+    static void debug(const GameProcess &state, const char *str);
 };
 
 #endif // BOTZONERUNNER_H

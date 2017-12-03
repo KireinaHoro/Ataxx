@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/resources">
+        <file>white.png</file>
+        <file>white_light.png</file>
+        <file>empty.png</file>
+        <file>black.png</file>
+        <file>black_light.png</file>
+    </qresource>
+</RCC>

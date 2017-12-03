@@ -1,9 +1,22 @@
-#include <botzonerunner.h>
+#include <QApplication>
+
+#include "mainwindow.h"
+#include "connect.h"
 
 int main(int argc, char *argv[])
 {
-    BotzoneRunner a;
-    a.run();
+    QApplication app(argc, argv);
 
-    return 0;
+    qRegisterMetaType<GameProcess>("GameProcess");
+
+    app.setOrganizationName("JSteward Tech");
+    app.setApplicationName("ataxx");
+
+    if (!createConnection())
+        return 1;
+
+    MainWindow mainWindow;
+    mainWindow.show();
+
+    return app.exec();
 }
