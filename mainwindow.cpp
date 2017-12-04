@@ -341,6 +341,7 @@ void MainWindow::judgeWinner()
         }
         else if (qobject_cast<QPushButton *>(msgBox.clickedButton()) == closeButton)
         {
+            writeSettings();
             this->close();
         }
     }
