@@ -48,6 +48,8 @@ private:
     QPixmap *pixmapEmpty;
     QPixmap *pixmapWhiteLight;
     QPixmap *pixmapBlackLight;
+    QPixmap *pixmapCloneHint;
+    QPixmap *pixmapJumpHint;
 
     QMenu *fileMenu;
     QMenu *settingsMenu;

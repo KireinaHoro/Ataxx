@@ -8,6 +8,7 @@
 
 #include <memory>
 #include <sstream>
+#include <cstdlib>
 
 #include "clickablelabel.h"
 #include "gameprocess.h"
@@ -109,6 +110,14 @@ void MainWindow::loadImages()
     pixmapWhiteLight = new QPixmap;
     if (!pixmapWhiteLight->load(":/resources/white_light.png"))
         qWarning("Failed to load white_light.png");
+
+    pixmapCloneHint = new QPixmap;
+    if (!pixmapCloneHint->load(":/resources/clone_hint.png"))
+        qWarning("Failed to load clone_hint.png");
+
+    pixmapJumpHint = new QPixmap;
+    if (!pixmapJumpHint->load(":/resources/jump_hint.png"))
+        qWarning("Failed to load jump_hint.png");
 }
 
 void MainWindow::loadLanguages()
@@ -243,9 +252,23 @@ void MainWindow::updateGameGrid()
                     label->setPixmap(*pixmapWhite);
                 break;
             case GameProcess::Absent:
+                if (selected != Location(-1, -1))
+                {
+                    if (std::abs(int(x - selected.first)) <= 1 && std::abs(int(y - selected.second)) <= 1)
+                    {
+                        label->setPixmap(*pixmapCloneHint);
+                        break;
+                    }
+                    else if (std::abs(int(x - selected.first)) <= 2 && std::abs(int(y - selected.second)) <= 2)
+                    {
+                        label->setPixmap(*pixmapJumpHint);
+                        break;
+                    }
+                }
                 label->setPixmap(*pixmapEmpty);
                 break;
             }
+
 
             // TODO process displaying available move locations
 
