@@ -418,9 +418,9 @@ void MainWindow::createActions()
             startAI();
     });
 
-    blackPlayerGroup = new QActionGroup(this);
-    blackPlayerGroup->addAction(whiteHuman);
-    blackPlayerGroup->addAction(whiteAI);
+    whitePlayerGroup = new QActionGroup(this);
+    whitePlayerGroup->addAction(whiteHuman);
+    whitePlayerGroup->addAction(whiteAI);
     whiteHuman->setChecked(true);
 
     startingPlayer = new QAction(tr("Black starts"), this);

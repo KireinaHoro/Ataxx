@@ -67,7 +67,7 @@ private:
     QAction *doExit;
     QAction *doAbout;
 
-    QActionGroup *blackPlayerGroup;
+    QActionGroup *whitePlayerGroup;
     QAction *whiteHuman;
     QAction *whiteAI;
 
