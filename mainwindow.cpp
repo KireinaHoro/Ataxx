@@ -118,6 +118,18 @@ void MainWindow::loadImages()
     pixmapJumpHint = new QPixmap;
     if (!pixmapJumpHint->load(":/resources/jump_hint.png"))
         qWarning("Failed to load jump_hint.png");
+
+    pixmapOldJumpPieceWhite = new QPixmap;
+    if (!pixmapOldJumpPieceWhite->load(":/resources/old_piece_jump_white.png"))
+        qWarning("Failed to load old_jump_piece_white.png");
+
+    pixmapOldClonePieceWhite = new QPixmap;
+    if (!pixmapOldClonePieceWhite->load(":/resources/old_piece_clone_white.png"))
+        qWarning("Failed to load old_clone_piece_white.png");
+
+    pixmapNewPieceWhite = new QPixmap;
+    if (!pixmapNewPieceWhite->load(":/resources/new_piece_white.png"))
+        qWarning("Failed to load new_piece_white.png");
 }
 
 void MainWindow::loadLanguages()
@@ -163,6 +175,30 @@ void MainWindow::setAIMove(GameProcess a)
     updateGameGrid();
     judgeWinner();
     setCurrentPlayerHint();
+
+    // show the move AI taken
+    char *move = new char[5];
+    game.getMoveStr(move);
+    unsigned int x0 = move[0] - 'a';
+    unsigned int y0 = move[1] - '1';
+    unsigned int x1 = move[2] - 'a';
+    unsigned int y1 = move[3] - '1';
+    for (unsigned int x = 0; x < GameProcess::BOARD_SIZE; x ++)
+        for (unsigned int y = 0; y < GameProcess::BOARD_SIZE; y ++)
+        {
+            QLayoutItem *item = gridLayout->itemAtPosition(y, x);
+            auto label = dynamic_cast<ClickableLabel *>(item->widget());
+
+            if (x == x0 && y == y0)
+            {
+                if (game.getPiece(x0, y0) == GameProcess::Absent)
+                    label->setPixmap(*pixmapOldJumpPieceWhite);
+                else
+                    label->setPixmap(*pixmapOldClonePieceWhite);
+            }
+            if (x == x1 && y == y1)
+                label->setPixmap(*pixmapNewPieceWhite);
+        }
 }
 
 void MainWindow::createSideBar()

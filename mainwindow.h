@@ -50,6 +50,9 @@ private:
     QPixmap *pixmapBlackLight;
     QPixmap *pixmapCloneHint;
     QPixmap *pixmapJumpHint;
+    QPixmap *pixmapOldJumpPieceWhite;
+    QPixmap *pixmapOldClonePieceWhite;
+    QPixmap *pixmapNewPieceWhite;
 
     QMenu *fileMenu;
     QMenu *settingsMenu;
