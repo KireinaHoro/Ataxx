@@ -160,8 +160,6 @@ void MainWindow::setAIMove(GameProcess a)
     //BotzoneRunner::debug(a, "in setAIMove");
     game = a;
 
-    // TODO implement undo
-
     updateGameGrid();
     judgeWinner();
     setCurrentPlayerHint();
@@ -268,9 +266,6 @@ void MainWindow::updateGameGrid()
                 label->setPixmap(*pixmapEmpty);
                 break;
             }
-
-
-            // TODO process displaying available move locations
 
             label->setScaledContents(true);
         }
