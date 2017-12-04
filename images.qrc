@@ -5,5 +5,7 @@
         <file>empty.png</file>
         <file>black.png</file>
         <file>black_light.png</file>
+        <file>jump_hint.png</file>
+        <file>clone_hint.png</file>
     </qresource>
 </RCC>
