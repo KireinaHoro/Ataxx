@@ -414,6 +414,8 @@ void MainWindow::createActions()
     connect(whiteAI, &QAction::toggled, [this]
     {
         black = new AIAtaxxPlayer;
+        if (!game.player)
+            startAI();
     });
 
     blackPlayerGroup = new QActionGroup(this);
