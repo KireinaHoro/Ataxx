@@ -592,9 +592,13 @@ void MainWindow::loadGame()
         settings.beginGroup("GameState");
         std::string str = settings.value("BoardData").toString().toStdString();
         size_t hash = settings.value("BoardDataHash").toULongLong();
-        game.loadProcess(GameProcess::StoreData(str, hash));
+        bool result = game.loadProcess(GameProcess::StoreData(str, hash));
         settings.endGroup();
         resetGame();
+        if (!result)
+            QMessageBox::warning(this, tr("Game loading failed"), tr("The save data seems to be corrupted. A new game will be created."));
+        else
+            QMessageBox::information(this, tr("Game loading finished"), tr("The saved game has been successfully loaded."));
     }
 }
 

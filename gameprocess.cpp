@@ -552,14 +552,16 @@ GameProcess::StoreData GameProcess::storeProcess()
     return StoreData(os.str(), std::hash<std::string>{}(os.str()));
 }
 
-void GameProcess::loadProcess(StoreData data)
+bool GameProcess::loadProcess(StoreData data)
 {
     if (data.second != std::hash<std::string>{}(data.first))    // the hash does not match
-        return;
+        return false;
 
     std::istringstream is(data.first);
 
     is >> board >> lastboard
        >> active >> lastactive
        >> player;
+
+    return true;
 }

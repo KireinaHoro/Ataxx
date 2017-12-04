@@ -64,9 +64,9 @@ public:
     bool  isEmpty();                            // check if the board is empty
     bool  isFull();                             // check if the board is full
 
-    using StoreData = std::pair<std::string, size_t>;
+    using     StoreData = std::pair<std::string, size_t>;
     StoreData storeProcess();                 // store the current game process into a std::string
-    void      loadProcess(StoreData data);       // load the game process from a std::string
+    bool      loadProcess(StoreData data);       // load the game process from a std::string
 };
 
 #endif // GAMEPROCESS_H
