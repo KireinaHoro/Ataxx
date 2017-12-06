@@ -28,6 +28,7 @@ MainWindow::MainWindow(QWidget *parent, Qt::WindowFlags flags)
     (void)GameAI::threadCount;
 
     setObjectName("MainWindow");
+    setWindowTitle(tr("Ataxx Main Window"));
 
     black = nullptr;
     selected = Location(-1, -1);
@@ -77,21 +78,17 @@ void MainWindow::changeEvent(QEvent *e)
 
 void MainWindow::retranslateUi()
 {
+    writeSettings();            // save the current settings so that the window size doesn't mutate
     setWindowTitle(tr("Ataxx Main Window"));
-    fileMenu->setTitle(tr("&File"));
-    settingsMenu->setTitle(tr("&Settings"));
-    whitePlayerMenu->setTitle(tr("&White player"));
-    langMenu->setTitle(tr("&Languages"));
-    highScoreMenu->setTitle(tr("&High score"));
-    aboutMenu->setTitle(tr("&About"));
-
-    doNewGame->setText(tr("&New game"));
-    doExit->setText(tr("E&xit"));
-    doLoad->setText(tr("&Load game"));
-    doSave->setText(tr("&Save game"));
-
-    restartButton->setText(tr("Restart"));
-    exitButton->setText(tr("Exit"));
+    // clear the menuBar() so that we don't have duplicate entries
+    menuBar()->clear();
+    createActions();
+    createMenus();
+    createMsgBox();
+    createSideBar();
+    createGameGrid();           // boxLayout needs to be recreated so that the locale in the sidebar can be reloaded
+    readSettings();             // restore the settings checked
+    resetGame();                // redraw the game board
 }
 
 void MainWindow::loadImages()
@@ -199,7 +196,7 @@ void MainWindow::createSideBar()
     sidebar->setStyleSheet("background-color: gray;");
     sidebar->setMinimumWidth(200);
 
-    restartButton = new QPushButton("Restart", sidebar);
+    restartButton = new QPushButton(tr("Restart"), sidebar);
     restartButton->setGeometry(QRect(QPoint(50, 50), QSize(100, 50)));
     restartButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
@@ -214,7 +211,7 @@ void MainWindow::createSideBar()
         }
     });
 
-    exitButton = new QPushButton("Exit", sidebar);
+    exitButton = new QPushButton(tr("Exit"), sidebar);
     exitButton->setGeometry(QRect(QPoint(50, 100), QSize(100, 50)));
     exitButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     connect(exitButton, &QPushButton::clicked, this, &MainWindow::close);
@@ -559,7 +556,7 @@ void MainWindow::switchTranslator(QTranslator &translator, const QString &filena
     qApp->removeTranslator(&translator);
 
     // load the new translator
-    if (translator.load(filename))
+    if (translator.load(filename, langPath))
         qApp->installTranslator(&translator);
 }
 
@@ -593,6 +590,7 @@ void MainWindow::createMenus()
     whitePlayerMenu->addAction(whiteHuman);
     whitePlayerMenu->addAction(whiteAI);
 
+    langMenu = menuBar()->addMenu(tr("&Language"));
     createLanguageMenu();
 
     settingsMenu->addAction(startingPlayer);
