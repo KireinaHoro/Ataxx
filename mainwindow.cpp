@@ -192,8 +192,8 @@ void MainWindow::setAIMove(GameProcess a)
 
 void MainWindow::createSideBar()
 {
-    sidebar = new QWidget(this);
-    sidebar->setStyleSheet("background-color: gray;");
+    sidebar = new QWidget;
+    sidebar->setStyleSheet("background-color: #d7c4bb;");   // Nippon Colors "Haizakura"
     sidebar->setMinimumWidth(200);
 
     restartButton = new QPushButton(tr("Restart"), sidebar);
@@ -244,6 +244,7 @@ void MainWindow::createGameGrid()
     boxLayout = new QHBoxLayout;
     board = new FixedRatioWidget;     // the board itself
     board->setLayout(gridLayout);
+    board->setStyleSheet("background-color: #fad689;");         // Nippon Colors "Usuki"
     boxLayout->addWidget(board);
     boxLayout->addWidget(sidebar);
 
