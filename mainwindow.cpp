@@ -80,15 +80,15 @@ void MainWindow::retranslateUi()
     setWindowTitle(tr("Ataxx Main Window"));
     fileMenu->setTitle(tr("&File"));
     settingsMenu->setTitle(tr("&Settings"));
-    whitePlayerMenu->setTitle(tr("&White Player"));
+    whitePlayerMenu->setTitle(tr("&White player"));
     langMenu->setTitle(tr("&Languages"));
-    highScoreMenu->setTitle(tr("&High Score"));
+    highScoreMenu->setTitle(tr("&High score"));
     aboutMenu->setTitle(tr("&About"));
 
-    doNewGame->setText(tr("&New Game"));
+    doNewGame->setText(tr("&New game"));
     doExit->setText(tr("E&xit"));
-    doLoad->setText(tr("&Load Game"));
-    doSave->setText(tr("&Save Game"));
+    doLoad->setText(tr("&Load game"));
+    doSave->setText(tr("&Save game"));
 
     restartButton->setText(tr("Restart"));
     exitButton->setText(tr("Exit"));
@@ -376,9 +376,9 @@ void MainWindow::judgeWinner()
         msgBox.setWindowTitle(tr("The game is over!"));
 
         if (winner)
-            msgBox.setText("Black won this round!");
+            msgBox.setText(tr("Black won this round!"));
         else
-            msgBox.setText("White won this round!");
+            msgBox.setText(tr("White won this round!"));
 
         msgBox.setInformativeText(tr("Score is %1. Restart or close?").arg(score));
 
@@ -402,7 +402,7 @@ void MainWindow::judgeWinner()
 
 void MainWindow::setCurrentPlayerHint()
 {
-    statusBar()->showMessage(QString(game.player ? "Black" : "White") + "'s turn.");
+    statusBar()->showMessage(QString(game.player ? tr("Black") : tr("White")) + tr("'s turn."));
 }
 
 void MainWindow::createActions()
@@ -741,10 +741,10 @@ void MainWindow::addHighScore()
     QSqlRecord record = model->record();
     record.setValue(as_integer(Columns::start), gameStart.toString(DATE_FORMAT));
     record.setValue(as_integer(Columns::end), gameEnd.toString(DATE_FORMAT));
-    record.setValue(as_integer(Columns::startingPlayer), startingPlayer->isChecked() ? "Black" : "White");
+    record.setValue(as_integer(Columns::startingPlayer), startingPlayer->isChecked() ? tr("Black") : tr("White"));
     int score = -game.getScore();
     bool winner = !game.player;
-    record.setValue(as_integer(Columns::playerWon), winner ? "Black" : (whiteAI->isChecked() ? "White (AI)" : "White"));
+    record.setValue(as_integer(Columns::playerWon), winner ? tr("Black") : (whiteAI->isChecked() ? tr("White (AI)") : tr("White")));
     record.setValue(as_integer(Columns::score), score);
     model->insertRecord(-1, record);
 }
