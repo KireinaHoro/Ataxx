@@ -742,8 +742,14 @@ void MainWindow::addHighScore()
     record.setValue(as_integer(Columns::start), gameStart.toString(DATE_FORMAT));
     record.setValue(as_integer(Columns::end), gameEnd.toString(DATE_FORMAT));
     record.setValue(as_integer(Columns::startingPlayer), startingPlayer->isChecked() ? tr("Black") : tr("White"));
-    int score = -game.getScore();
-    bool winner = !game.player;
+    // the winner should be judged by the current player's score
+    int score = game.getScore();              // when the game is over the current player lost
+    bool winner;
+    if (score > 0)
+        winner = game.player;
+    else
+        winner = !game.player;
+    score = std::abs(score);
     record.setValue(as_integer(Columns::playerWon), winner ? tr("Black") : (whiteAI->isChecked() ? tr("White (AI)") : tr("White")));
     record.setValue(as_integer(Columns::score), score);
     model->insertRecord(-1, record);
