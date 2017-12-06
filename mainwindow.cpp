@@ -365,8 +365,14 @@ void MainWindow::judgeWinner()
     if (!game.isMoveAvailable())
     {
         gameEnd = QDateTime::currentDateTime();
-        int score = -game.getScore();              // when the game is over the current player lost
-        bool winner = !game.player;
+        // the winner should be judged by the current player's score
+        int score = game.getScore();              // when the game is over the current player lost
+        bool winner;
+        if (score > 0)
+            winner = game.player;
+        else
+            winner = !game.player;
+        score = std::abs(score);
 
         statusBar()->showMessage(tr("The game is over!"));
 
