@@ -207,7 +207,7 @@ void MainWindow::createSideBar()
         {
             game = GameProcess(startingPlayer->isChecked());
             resetGame();
-            BotzoneRunner::debug(game, "GAME HAS BEEN RESET");
+            //BotzoneRunner::debug(game, "GAME HAS BEEN RESET");
         }
     });
 
