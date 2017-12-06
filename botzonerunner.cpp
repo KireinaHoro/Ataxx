@@ -4,7 +4,8 @@
 
 BotzoneRunner::BotzoneRunner()
 {
-
+    (void)GameAI::timeToQuit;
+    (void)GameAI::threadCount;
 }
 
 void BotzoneRunner::run()

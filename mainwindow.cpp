@@ -27,6 +27,9 @@ MainWindow::MainWindow(QWidget *parent, Qt::WindowFlags flags)
     : QMainWindow(parent, flags),
       game(GameProcess())
 {
+    (void)GameAI::timeToQuit;
+    (void)GameAI::threadCount;
+
     setObjectName("MainWindow");
 
     black = nullptr;
@@ -213,6 +216,7 @@ void MainWindow::createSideBar()
 
     connect(restartButton, &QPushButton::clicked, [this](bool clicked)
     {
+        (void)clicked;
         if (!isGameRunning() || (resetMsgBox->exec() == QMessageBox::Ok))
         {
             game = GameProcess(startingPlayer->isChecked());

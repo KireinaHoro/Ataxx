@@ -7,6 +7,9 @@
 
 GameProcess AIAtaxxPlayer::getMove(const GameProcess &current)
 {
+    (void)GameAI::timeToQuit;
+    (void)GameAI::threadCount;
+
     //BotzoneRunner::debug(current, "in getMove, before parallel");
     GameProcess ret = GameAI::runParallelAI(current);
     //BotzoneRunner::debug(ret, "in getMove, after parallel");
