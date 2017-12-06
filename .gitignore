@@ -1,3 +1,4 @@
 submission*
 *.pro.user
 .directory
+languages/*.qm
