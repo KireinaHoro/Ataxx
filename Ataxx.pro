@@ -56,3 +56,8 @@ CONFIG += c++14
 
 RESOURCES += \
     images.qrc
+
+TRANSLATIONS += \
+    languages/Translation_en_US.ts \
+    languages/Translation_ja_JP.ts \
+    languages/Translation_zh_TW.ts
