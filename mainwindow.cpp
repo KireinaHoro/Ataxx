@@ -676,11 +676,11 @@ void MainWindow::closeEvent(QCloseEvent *event)
         msg.setStandardButtons(QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
         msg.setDefaultButton(QMessageBox::Cancel);
         auto response = msg.exec();
+        writeSettings();    // always save settings
         if (response == QMessageBox::Yes)
         {
             saveGame();
             model->submitAll();
-            writeSettings();
             event->accept();
         }
         if (response == QMessageBox::Cancel)
@@ -714,7 +714,10 @@ void MainWindow::loadGame()
         settings.endGroup();
         resetGame();
         if (!result)
+        {
             QMessageBox::warning(this, tr("Game loading failed"), tr("The save data seems to be corrupted. A new game will be created."));
+            saveGame();         // clear the corrupted state
+        }
         else
             QMessageBox::information(this, tr("Game loading finished"), tr("The saved game has been successfully loaded."));
     }
