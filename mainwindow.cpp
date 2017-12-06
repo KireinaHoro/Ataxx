@@ -5,6 +5,7 @@
 #include <QApplication>
 #include <QSqlQuery>
 #include <QSqlRecord>
+#include <QDir>
 
 #include <memory>
 #include <sstream>
@@ -18,10 +19,6 @@
 #include "utils.h"
 #include "aiataxxplayer.h"
 #include "botzonerunner.h"
-
-const QString MainWindow::languages[] = {
-    "en_US", "ja_JP", "zh_TW"
-};
 
 MainWindow::MainWindow(QWidget *parent, Qt::WindowFlags flags)
     : QMainWindow(parent, flags),
@@ -48,29 +45,34 @@ MainWindow::MainWindow(QWidget *parent, Qt::WindowFlags flags)
 
     createHighScoreModel();
 
-    loadLanguages();
-    retranslateUi();
-
     statusBar()->showMessage(tr("Ready"));
 
     resetGame();
 }
 
-void MainWindow::switchLanguage()
-{
-    // TODO implement translation
-    if (langEn->isChecked())
-        qApp->removeTranslator(translator);
-    else
-        qApp->installTranslator(translator);
-}
-
 void MainWindow::changeEvent(QEvent *e)
 {
-    if (e->type() == QEvent::LanguageChange)
-        retranslateUi();
-    else
+    if (e)
+    {
+        QString locale;
+        switch (e->type())
+        {
+        case QEvent::LanguageChange:
+            // event will be sent if a translator is loaded
+            retranslateUi();
+            break;
+
+        case QEvent::LocaleChange:
+            // event will be sent if the system locale changes
+            locale = QLocale::system().name();
+            loadLanguage(locale);
+            break;
+
+        default:
+            ;
+        }
         QMainWindow::changeEvent(e);
+    }
 }
 
 void MainWindow::retranslateUi()
@@ -133,19 +135,6 @@ void MainWindow::loadImages()
     pixmapNewPieceWhite = new QPixmap;
     if (!pixmapNewPieceWhite->load(":/resources/new_piece_white.png"))
         qWarning("Failed to load new_piece_white.png");
-}
-
-void MainWindow::loadLanguages()
-{
-    translator = new QTranslator;
-    for (auto &i : languages)
-    {
-        if (!translator->load(i, ":/resources"))
-        {
-            QByteArray arr = ("Failed to load " + i + " language").toUtf8();
-            qWarning(arr.data());
-        }
-    }
 }
 
 MainWindow::~MainWindow()
@@ -503,6 +492,7 @@ void MainWindow::createActions()
     doAbout->setStatusTip(tr("About this application"));
     connect(doAbout, &QAction::triggered, this, &MainWindow::about);
 
+    /*
     langEn = new QAction(tr("en_US"), this);
     langEn->setCheckable(true);
     langEn->setStatusTip(tr("Change language to en_US"));
@@ -517,6 +507,74 @@ void MainWindow::createActions()
     langZh->setCheckable(true);
     langZh->setStatusTip(tr("Change language to zh_CN"));
     connect(langZh, &QAction::triggered, this, &MainWindow::switchLanguage);
+    */
+}
+
+// menu entries are created dynamically, dependent on the existing translations
+void MainWindow::createLanguageMenu()
+{
+    langGroup = new QActionGroup(langMenu);
+    langGroup->setExclusive(true);
+
+    connect(langGroup, &QActionGroup::triggered, this, &MainWindow::slotLanguageChanged);
+
+    // format system language
+    QString defaultLocale = QLocale::system().name();           // e.g. "ja_JP"
+    //defaultLocale.truncate(defaultLocale.lastIndexOf('_'));     // e.g. "ja"
+
+    langPath = QApplication::applicationDirPath();
+    langPath.append("/languages");
+    QDir dir(langPath);
+    QStringList fileNames = dir.entryList(QStringList("Translation_*.qm"));
+
+    for (auto i : fileNames)                // "Translation_ja_JP.qm"
+    {
+        i.truncate(i.lastIndexOf('.'));     // "Translation_ja_JP"
+        i.remove(0, i.indexOf('_') + 1);    // "ja_JP"
+
+        QString lang = QLocale::languageToString(QLocale(i).language());
+        QAction *action = new QAction(lang, this);
+        action->setCheckable(true);
+        action->setData(i);
+
+        langMenu->addAction(action);
+        langGroup->addAction(action);
+
+        if (defaultLocale == i)
+            action->setChecked(true);
+    }
+}
+
+// called when an enrty in the language menu is called
+void MainWindow::slotLanguageChanged(QAction *action)
+{
+    if (action)
+        // load the language according to the action
+        loadLanguage(action->data().toString());
+}
+
+void MainWindow::switchTranslator(QTranslator &translator, const QString &filename)
+{
+    // remove the old translator
+    qApp->removeTranslator(&translator);
+
+    // load the new translator
+    if (translator.load(filename))
+        qApp->installTranslator(&translator);
+}
+
+void MainWindow::loadLanguage(const QString &language)
+{
+    if (currLang != language)
+    {
+        currLang = language;
+        QLocale locale = QLocale(language);
+        QLocale::setDefault(locale);
+        QString languageName = QLocale::languageToString(locale.language());
+        switchTranslator(translator, QString("Translation_%1.qm").arg(language));
+        switchTranslator(translatorQt, QString("qt_%1.qm").arg(language));
+        statusBar()->showMessage(tr("Current language changed to %1").arg(languageName));
+    }
 }
 
 void MainWindow::createMenus()
@@ -535,10 +593,7 @@ void MainWindow::createMenus()
     whitePlayerMenu->addAction(whiteHuman);
     whitePlayerMenu->addAction(whiteAI);
 
-    langMenu = settingsMenu->addMenu(tr("&Language"));
-    langMenu->addAction(langEn);
-    langMenu->addAction(langJa);
-    langMenu->addAction(langZh);
+    createLanguageMenu();
 
     settingsMenu->addAction(startingPlayer);
 

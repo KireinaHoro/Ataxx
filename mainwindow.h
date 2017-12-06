@@ -78,13 +78,6 @@ private:
 
     QAction *startingPlayer;
 
-    QActionGroup *langGroup;
-    QAction *langEn;
-    QAction *langJa;
-    QAction *langZh;
-
-    QTranslator *translator;
-
     QAction *showScoreDialog;
     QAction *doScoreClear;
 
@@ -105,10 +98,27 @@ public:
 
 protected:
     void closeEvent(QCloseEvent *event) override;
+    // this method is called when a new translator is loaded or the system language is changed
     void changeEvent(QEvent *) override;
 
+protected slots:
+    // this slot is called by the language menu actions
+    void slotLanguageChanged(QAction *action);
+
 private:
-    void switchLanguage();
+    // loads a language by the given language shorthand (e.g. zh, ja, en)
+    void loadLanguage(const QString &language);
+
+    // creates the language menu dynamically from the contents of langPath
+    void createLanguageMenu();
+    void switchTranslator(QTranslator &translator, const QString &filename);
+
+    QActionGroup *langGroup;
+    QTranslator translator;     // contains the translations for this application
+    QTranslator translatorQt;   // contains the translations for Qt
+    QString currLang;           // contains the currently loaded language
+    QString langPath;           // path of language files, always fixed to /languages
+
 
     // UI helpers
     void createGameGrid();
@@ -121,7 +131,6 @@ private:
     void createMsgBox();
     void createSideBar();
     void loadImages();
-    void loadLanguages();
 
     static const QString languages[];
 
