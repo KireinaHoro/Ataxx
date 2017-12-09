@@ -33,8 +33,11 @@ MainWindow::MainWindow(QWidget *parent, Qt::WindowFlags flags)
     black = nullptr;
     selected = Location(-1, -1);
 
+    langInitialized = false;
+
     createActions();
-    createMenus();
+    createMenus(false);
+
     createMsgBox();
 
     loadImages();
@@ -83,7 +86,7 @@ void MainWindow::retranslateUi()
     // clear the menuBar() so that we don't have duplicate entries
     menuBar()->clear();
     createActions();
-    createMenus();
+    createMenus(true);
     createMsgBox();
     createSideBar();
     createGameGrid();           // boxLayout needs to be recreated so that the locale in the sidebar can be reloaded
@@ -509,12 +512,15 @@ void MainWindow::createActions()
 }
 
 // menu entries are created dynamically, dependent on the existing translations
-void MainWindow::createLanguageMenu()
+void MainWindow::createLanguageMenu(bool isReload)
 {
-    langGroup = new QActionGroup(langMenu);
-    langGroup->setExclusive(true);
+    if (!isReload)
+    {
+        langGroup = new QActionGroup(langMenu);
+        langGroup->setExclusive(true);
 
-    connect(langGroup, &QActionGroup::triggered, this, &MainWindow::slotLanguageChanged);
+        connect(langGroup, &QActionGroup::triggered, this, &MainWindow::slotLanguageChanged);
+    }
 
     // format system language
     QString defaultLocale = QLocale::system().name();           // e.g. "ja_JP"
@@ -539,16 +545,25 @@ void MainWindow::createLanguageMenu()
         langGroup->addAction(action);
 
         if (defaultLocale == i)
+        {
             action->setChecked(true);
+            if (!langInitialized)
+            {
+                loadLanguage(i);
+                langInitialized = true;
+            }
+        }
     }
 }
 
-// called when an enrty in the language menu is called
+// called when an entry in the language menu is triggered
 void MainWindow::slotLanguageChanged(QAction *action)
 {
     if (action)
+    {
         // load the language according to the action
         loadLanguage(action->data().toString());
+    }
 }
 
 void MainWindow::switchTranslator(QTranslator &translator, const QString &filename)
@@ -575,7 +590,7 @@ void MainWindow::loadLanguage(const QString &language)
     }
 }
 
-void MainWindow::createMenus()
+void MainWindow::createMenus(bool isReload)
 {
     fileMenu = menuBar()->addMenu(tr("&File"));
     fileMenu->addAction(doNewGame);
@@ -592,7 +607,7 @@ void MainWindow::createMenus()
     whitePlayerMenu->addAction(whiteAI);
 
     langMenu = menuBar()->addMenu(tr("&Language"));
-    createLanguageMenu();
+    createLanguageMenu(isReload);
 
     settingsMenu->addAction(startingPlayer);
 

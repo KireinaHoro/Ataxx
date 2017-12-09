@@ -110,7 +110,7 @@ private:
     void loadLanguage(const QString &language);
 
     // creates the language menu dynamically from the contents of langPath
-    void createLanguageMenu();
+    void createLanguageMenu(bool isReload);
     void switchTranslator(QTranslator &translator, const QString &filename);
 
     QActionGroup *langGroup;
@@ -119,6 +119,7 @@ private:
     QString currLang;           // contains the currently loaded language
     QString langPath;           // path of language files, always fixed to /languages
 
+    bool langInitialized;       // see if the startup stage of language initialization has finished
 
     // UI helpers
     void createGameGrid();
@@ -127,7 +128,7 @@ private:
     void clickedGamePiece(unsigned int x, unsigned int y);
     bool gameIsRunning();
     void createActions();
-    void createMenus();
+    void createMenus(bool isReload);
     void createMsgBox();
     void createSideBar();
     void loadImages();
